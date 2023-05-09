@@ -86,4 +86,27 @@ public class TicketDAO {
         }
         return false;
     }
+
+    public int getNBTicket(String vehicleRegString) {
+        int parkingOccurrence = 0;
+        Connection con = null;
+
+        try {
+            con = dataBaseConfig.getConnection();
+            PreparedStatement ps = con.prepareStatement(DBConstants.COUNT_NB_TIME_IN_PARKING);
+            ps.setString(1, vehicleRegNumber);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                parkingOccurrence = rs.getInt(1);
+            }
+            dataBaseConfig.closeresultSet(rs);
+            dataBaseConfig.closePreparedStatement(ps);
+        } catch (Exception e) {
+            logger.error("Error while counting ticket", ex);
+        } finally {
+            dataBaseConfig.closeConnection(con);
+        }
+        return parkingOccurence;
+    }
 }
