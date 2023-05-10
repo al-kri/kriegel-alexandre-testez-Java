@@ -87,7 +87,7 @@ public class TicketDAO {
         return false;
     }
 
-    public int getNBTicket(String vehicleRegString) {
+    public int getNbTicket(String vehicleRegNumber) {
         int parkingOccurrence = 0;
         Connection con = null;
 
@@ -100,13 +100,13 @@ public class TicketDAO {
             if (rs.next()) {
                 parkingOccurrence = rs.getInt(1);
             }
-            dataBaseConfig.closeresultSet(rs);
+            dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
-        } catch (Exception e) {
+        } catch (Exception ex) {
             logger.error("Error while counting ticket", ex);
         } finally {
             dataBaseConfig.closeConnection(con);
         }
-        return parkingOccurence;
+        return parkingOccurrence;
     }
 }
