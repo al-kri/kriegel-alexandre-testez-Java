@@ -93,7 +93,7 @@ public class TicketDAO {
 
         try {
             con = dataBaseConfig.getConnection();
-            PreparedStatement ps = con.prepareStatement(DBConstants.COUNT_NB_TIME_IN_PARKING);
+            PreparedStatement ps = con.prepareStatement(DBConstants.GET_NB_TICKET);
             ps.setString(1, vehicleRegNumber);
             ResultSet rs = ps.executeQuery();
 
