@@ -88,7 +88,7 @@ public class TicketDAO {
     }
 
     public int getNbTicket(String vehicleRegNumber) {
-        int parkingOccurrence = 0;
+        int parkingOccurrence = -1;
         Connection con = null;
 
         try {

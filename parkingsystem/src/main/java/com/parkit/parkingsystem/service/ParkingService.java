@@ -32,6 +32,9 @@ public class ParkingService {
             ParkingSpot parkingSpot = getNextParkingNumberIfAvailable();
             if(parkingSpot !=null && parkingSpot.getId() > 0){
                 String vehicleRegNumber = getVehicleRegNumber();
+                if (ticketDAO.getNbTicket(vehicleRegNumber) > 1) {
+                    System.out.println("Happy to see you again ! As a regular user of our car park, you will get a 5% discount");
+                }
                 parkingSpot.setAvailable(false);
                 parkingSpotDAO.updateParking(parkingSpot);//allot this parking space and mark it's availability as false
 
@@ -44,9 +47,6 @@ public class ParkingService {
                 ticket.setPrice(0);
                 ticket.setInTime(inTime);
                 ticket.setOutTime(null);
-                if (ticketDAO.getNbTicket(ticket.getVehicleRegNumber()) >= 1) {
-                    System.out.println("Happy to see you again ! As a regular user of our car park, you will get a 5% discount");
-                }
                 ticketDAO.saveTicket(ticket);
                 System.out.println("Generated Ticket and saved in DB");
                 System.out.println("Please park your vehicle in spot number:"+parkingSpot.getId());
@@ -106,25 +106,20 @@ public class ParkingService {
             Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
             Date outTime = new Date();
             ticket.setOutTime(outTime);
-            if (ticketDAO.updateTicket(ticket)) {
-                if (ticketDAO.getNbTicket(ticket.getVehicleRegNumber()) >= 1) {
-                    ParkingSpot parkingSpot = ticket.getParkingSpot();
-                    parkingSpot.setAvailable(true);
-                    parkingSpotDAO.updateParking(parkingSpot);
-                    fareCalculatorService.calculateFare(ticket, true);
-                    if (ticket.getPrice() > 0) {
-                        System.out.println("Vous venez de beneficier de 5% de reduction");
-                    }
-                    System.out.println("Please pay the parking fare:" + ticket.getPrice());
-                    System.out.println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
-                } else {
-                    ParkingSpot parkingSpot = ticket.getParkingSpot();
-                    parkingSpot.setAvailable(true);
-                    parkingSpotDAO.updateParking(parkingSpot);
-                    fareCalculatorService.calculateFare(ticket);
-                    System.out.println("Please pay the parking fare:" + ticket.getPrice());
-                    System.out.println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
+            if (ticketDAO.getNbTicket(vehicleRegNumber) > 1) {
+                fareCalculatorService.calculateFare(ticket, true);
+                if (ticket.getPrice() > 0) {
+                    System.out.println("Vous venez de beneficier de 5% de reduction");
                 }
+            } else {
+                fareCalculatorService.calculateFare(ticket);
+            }            
+            if (ticketDAO.updateTicket(ticket)) {
+                    ParkingSpot parkingSpot = ticket.getParkingSpot();
+                    parkingSpot.setAvailable(true);
+                    parkingSpotDAO.updateParking(parkingSpot);
+                    System.out.println("Please pay the parking fare:" + ticket.getPrice());
+                    System.out.println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
             } else {
                 System.out.println("Unable to update ticket information. Error occurred");
             }

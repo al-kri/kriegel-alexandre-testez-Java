@@ -37,8 +37,7 @@ public class ParkingServiceTest {
     private TicketDAO ticketDAO;
 
     @BeforeEach
-    private void setUpPerTest() {
-        try {
+    private void setUpPerTest() throws Exception {
             when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
 
             ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR,false);
@@ -50,27 +49,46 @@ public class ParkingServiceTest {
             when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(true);
 
             parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw  new RuntimeException("Failed to set up test mock objects");
-        }
     }
 
     @Test
     public void processExitingVehicleTest() {
-        when(ticketDAO.getNbTicket(any(String.class))).thenReturn(1);
+        when(ticketDAO.getNbTicket(any(String.class))).thenReturn(2);
         
         parkingService.processExitingVehicle();
 
-        verify(ticketDAO).getNbTicket(eq("ABCDEF"));
         verify(parkingSpotDAO).updateParking(any(ParkingSpot.class));
+        verify(ticketDAO).getNbTicket(anyString());
+
+    }
+
+    @Test
+    public void processExitingVehicleWithoutDiscountTest() {
+        when(ticketDAO.getNbTicket(any(String.class))).thenReturn(0);
+
+        parkingService.processExitingVehicle();
+
+        verify(parkingSpotDAO).updateParking(any(ParkingSpot.class));
+        verify(ticketDAO).getNbTicket(anyString());
     }
 
     @Test
     public void testProcessIncomingVehicle() throws Exception {
         when(inputReaderUtil.readSelection()).thenReturn(2);
         when(parkingSpotDAO.getNextAvailableSlot(any())).thenReturn(1);
-        when(ticketDAO.getNbTicket(any(String.class))).thenReturn(1);
+        when(ticketDAO.saveTicket(any(Ticket.class))).thenReturn(true);
+
+        parkingService.processIncomingVehicle();
+
+        verify(parkingSpotDAO).updateParking(any(ParkingSpot.class));
+        verify(ticketDAO).saveTicket(any(Ticket.class));
+    }
+
+    @Test
+    public void processIncomingVehicleWithDiscountTest() throws Exception {
+        when(inputReaderUtil.readSelection()).thenReturn(1);
+        when(parkingSpotDAO.getNextAvailableSlot(any())).thenReturn(1);
+        when(ticketDAO.getNbTicket(any(String.class))).thenReturn(2);
         when(ticketDAO.saveTicket(any(Ticket.class))).thenReturn(true);
 
         parkingService.processIncomingVehicle();
@@ -84,7 +102,9 @@ public class ParkingServiceTest {
         when(inputReaderUtil.readSelection()).thenReturn(1);
         when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(false);
 
-        parkingService.processExitingVehicle();
+        Assertions.assertDoesNotThrow( () -> {
+            parkingService.processExitingVehicle();
+        });
 
         verify(parkingSpotDAO, never()).updateParking(any(ParkingSpot.class));
     }
