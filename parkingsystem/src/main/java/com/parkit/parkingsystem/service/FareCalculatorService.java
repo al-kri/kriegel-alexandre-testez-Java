@@ -5,6 +5,11 @@ import com.parkit.parkingsystem.model.Ticket;
 
 public class FareCalculatorService {
 
+	/**
+	 * Calculates the parking fees with discount for recurring user
+	 * @param ticket Ticket
+	 * @param discount boolean
+	 */
     public void calculateFare(Ticket ticket, boolean discount){
         if( (ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime())) ){
             throw new IllegalArgumentException("Out time provided is incorrect:"+ticket.getOutTime().toString());
@@ -37,7 +42,7 @@ public class FareCalculatorService {
                 }
                 break;
             
-            default: throw new IllegalArgumentException("Unkown Parking Type");
+            default: throw new IllegalArgumentException("Unknown Parking Type");
         }
 
         if (discount) {
@@ -45,6 +50,10 @@ public class FareCalculatorService {
         }
     }
 
+	/**
+	 * Calculates the parking fees for user without the recurring user discount
+	 * @param ticket Ticket
+	 */
     public void calculateFare(Ticket ticket) {
         calculateFare(ticket, false);
     }

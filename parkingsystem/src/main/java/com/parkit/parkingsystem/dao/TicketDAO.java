@@ -19,6 +19,11 @@ public class TicketDAO {
 
     public DataBaseConfig dataBaseConfig = new DataBaseConfig();
 
+    /**
+     * Save a ticket in the Database
+     * @param ticket Ticket
+     * @return boolean
+     */
     public boolean saveTicket(Ticket ticket){
         Connection con = null;
         try {
@@ -40,6 +45,11 @@ public class TicketDAO {
         }
     }
 
+    /**
+     * Get the parking ticket of the vehicle plate registration number entered as input
+     * @param vehicleRegNumber String
+     * @return ticket
+     */
     public Ticket getTicket(String vehicleRegNumber) {
         Connection con = null;
         Ticket ticket = null;
@@ -69,6 +79,11 @@ public class TicketDAO {
         }
     }
 
+    /**
+     * Update a ticket in the Database
+     * @param ticket Ticket
+     * @return boolean
+     */
     public boolean updateTicket(Ticket ticket) {
         Connection con = null;
         try {
@@ -87,6 +102,11 @@ public class TicketDAO {
         return false;
     }
 
+    /**
+     * Get the number of occurrence a vehicle has in the Database using its registration plate number
+     * @param vehicleRegNumber String
+     * @return int
+     */
     public int getNbTicket(String vehicleRegNumber) {
         int parkingOccurrence = -1;
         Connection con = null;

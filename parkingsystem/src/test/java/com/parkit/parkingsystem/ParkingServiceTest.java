@@ -59,7 +59,6 @@ public class ParkingServiceTest {
 
         verify(parkingSpotDAO).updateParking(any(ParkingSpot.class));
         verify(ticketDAO).getNbTicket(anyString());
-
     }
 
     @Test
@@ -85,7 +84,7 @@ public class ParkingServiceTest {
     }
 
     @Test
-    public void processIncomingVehicleWithDiscountTest() throws Exception {
+    public void testProcessIncomingVehicleWithDiscount() throws Exception {
         when(inputReaderUtil.readSelection()).thenReturn(1);
         when(parkingSpotDAO.getNextAvailableSlot(any())).thenReturn(1);
         when(ticketDAO.getNbTicket(any(String.class))).thenReturn(2);
@@ -143,5 +142,4 @@ public class ParkingServiceTest {
         });
         Assertions.assertNull(parkingSpot);        
     }
-
 }
