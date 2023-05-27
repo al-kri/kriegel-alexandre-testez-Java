@@ -5,27 +5,56 @@ import com.parkit.parkingsystem.model.Ticket;
 
 public class FareCalculatorService {
 
-    public void calculateFare(Ticket ticket){
+	/**
+	 * Calculates the parking fees with discount for recurring user
+	 * @param ticket Ticket
+	 * @param discount boolean
+	 */
+    public void calculateFare(Ticket ticket, boolean discount){
         if( (ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime())) ){
             throw new IllegalArgumentException("Out time provided is incorrect:"+ticket.getOutTime().toString());
         }
 
-        int inHour = ticket.getInTime().getHours();
-        int outHour = ticket.getOutTime().getHours();
-
-        //TODO: Some tests are failing here. Need to check if this logic is correct
-        int duration = outHour - inHour;
+        double inHour = ticket.getInTime().getTime();
+        double outHour = ticket.getOutTime().getTime();
+        
+        double duration = outHour - inHour;
+        double durationInHours = duration / 3600000;
+        
+        double freeParking = 0.50;
 
         switch (ticket.getParkingSpot().getParkingType()){
             case CAR: {
-                ticket.setPrice(duration * Fare.CAR_RATE_PER_HOUR);
+                if (durationInHours <= freeParking) {
+                    ticket.setPrice(0);
+                } else {
+                    ticket.setPrice(durationInHours * Fare.CAR_RATE_PER_HOUR);
+                    }
+                }
                 break;
-            }
+            
             case BIKE: {
-                ticket.setPrice(duration * Fare.BIKE_RATE_PER_HOUR);
+                if (durationInHours <= freeParking) {
+                    ticket.setPrice(0);
+                } else {
+                     ticket.setPrice(durationInHours * Fare.BIKE_RATE_PER_HOUR);
+                    }
+                }
                 break;
-            }
-            default: throw new IllegalArgumentException("Unkown Parking Type");
+            
+            default: throw new IllegalArgumentException("Unknown Parking Type");
         }
+
+        if (discount) {
+            ticket.setPrice(ticket.getPrice() * 0.95);
+        }
+    }
+
+	/**
+	 * Calculates the parking fees for user without the recurring user discount
+	 * @param ticket Ticket
+	 */
+    public void calculateFare(Ticket ticket) {
+        calculateFare(ticket, false);
     }
 }

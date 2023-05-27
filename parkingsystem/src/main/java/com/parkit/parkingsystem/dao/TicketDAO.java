@@ -19,6 +19,11 @@ public class TicketDAO {
 
     public DataBaseConfig dataBaseConfig = new DataBaseConfig();
 
+    /**
+     * Save a ticket in the Database
+     * @param ticket Ticket
+     * @return boolean
+     */
     public boolean saveTicket(Ticket ticket){
         Connection con = null;
         try {
@@ -40,6 +45,11 @@ public class TicketDAO {
         }
     }
 
+    /**
+     * Get the parking ticket of the vehicle plate registration number entered as input
+     * @param vehicleRegNumber String
+     * @return ticket
+     */
     public Ticket getTicket(String vehicleRegNumber) {
         Connection con = null;
         Ticket ticket = null;
@@ -69,6 +79,11 @@ public class TicketDAO {
         }
     }
 
+    /**
+     * Update a ticket in the Database
+     * @param ticket Ticket
+     * @return boolean
+     */
     public boolean updateTicket(Ticket ticket) {
         Connection con = null;
         try {
@@ -85,5 +100,33 @@ public class TicketDAO {
             dataBaseConfig.closeConnection(con);
         }
         return false;
+    }
+
+    /**
+     * Get the number of occurrence a vehicle has in the Database using its registration plate number
+     * @param vehicleRegNumber String
+     * @return int
+     */
+    public int getNbTicket(String vehicleRegNumber) {
+        int parkingOccurrence = -1;
+        Connection con = null;
+
+        try {
+            con = dataBaseConfig.getConnection();
+            PreparedStatement ps = con.prepareStatement(DBConstants.GET_NB_TICKET);
+            ps.setString(1, vehicleRegNumber);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                parkingOccurrence = rs.getInt(1);
+            }
+            dataBaseConfig.closeResultSet(rs);
+            dataBaseConfig.closePreparedStatement(ps);
+        } catch (Exception ex) {
+            logger.error("Error while counting ticket", ex);
+        } finally {
+            dataBaseConfig.closeConnection(con);
+        }
+        return parkingOccurrence;
     }
 }
