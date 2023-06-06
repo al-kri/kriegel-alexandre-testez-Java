@@ -109,7 +109,7 @@ public class ParkingService {
             if (ticketDAO.getNbTicket(vehicleRegNumber) > 1) {
                 fareCalculatorService.calculateFare(ticket, true);
                 if (ticket.getPrice() > 0) {
-                    System.out.println("Vous venez de beneficier de 5% de reduction");
+                    System.out.println("You received a 5% discount, see you soon !");
                 }
             } else {
                 fareCalculatorService.calculateFare(ticket);
